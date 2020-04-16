@@ -58,7 +58,7 @@ def add_record():
                occupation, 'nationality': nationality}
     
     try:
-        coll.insert_one(new_doc)
+        coll.insert(new_doc)
         print("")
         print("Document inserted")
     except:
