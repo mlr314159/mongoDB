@@ -13,6 +13,7 @@ def mongo_connect(url):
     except pymongo.errors.ConnectionFailure as e:
         print("Could not connect to MongoDB: %s") % e
 
+
 def show_menu():
     print("")
     print("1. Add a record")
@@ -24,26 +25,22 @@ def show_menu():
     option = input("Enter option: ")
     return option
 
+
 def get_record():
     print("")
     first = input("Enter first name > ")
     last = input("Enter last name > ")
 
-try:
-        documents = coll.find({'first': first.lower(), 'last': first.lower()})
-
-
-except:
+    try:
+        doc = coll.find_one({'first': first.lower(), 'last': last.lower()})
+    except:
         print("Error accessing the database")
 
-def find_record():
-    doc = get_record()
-    if doc:
+    if not doc:
         print("")
-        for k,v in doc.items():
-            if k! = "_id":
-                print(k.capitalize() + ":" v.capitalize())
+        print("Error! No results")
 
+    return doc
 
 
 def add_record():
@@ -74,6 +71,35 @@ def add_record():
     return doc
 
 
+
+def find_record():
+    doc = get_record()
+    if doc:
+        print("")
+        for k, v in doc.items():
+            if k != "_id":
+                print(k.capitalize() + ":" + v.capitalize())
+
+
+def edit_record():
+    doc = get_record()
+    if doc:
+        update_doc={}
+        print("")
+        for k, v in doc.items():
+            if k != "_id":
+                update_doc[k] = input(k.capitalize() + " [" + v + "] > ")
+
+                if update_doc[k] == "":
+                    update_doc[k] = v
+        try:
+            coll.update_one(doc, {'$set': update_doc})
+            print("")
+            print("Documnet updated")
+        except:
+            print("Error accessing")
+
+
 def main_loop():
     while True:
         option = show_menu()
@@ -82,7 +108,7 @@ def main_loop():
         elif option == "2":
             find_record()
         elif option == "3":
-            print("You have selected option 3")
+            edit_record()
         elif option == "4":
             print("You have selected option 4")
         elif option == "5":
